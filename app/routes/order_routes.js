@@ -93,6 +93,6 @@ router.route('/:id')
   .delete(findOrderMiddleware, deleteOrder)
 
 // Custom Routes
-router.patch('/orders/:id/checkout', requireToken, findOrderMiddleware, checkoutOrder)
+router.patch('/:id/checkout', findOrderMiddleware, checkoutOrder)
 
 module.exports = router
