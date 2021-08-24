@@ -18,4 +18,17 @@ const orderSchema = new Schema({
   timestamps: true
 })
 
+const populateProductsQuery = function () {
+  this.populate('products')
+}
+
+const populateProductsDoc = async function (doc) {
+  await doc.populate('products').execPopulate()
+}
+
+orderSchema
+  .pre('find', populateProductsQuery)
+  .pre('findOne', populateProductsQuery)
+  .post('save', populateProductsDoc)
+
 module.exports = model('Order', orderSchema)

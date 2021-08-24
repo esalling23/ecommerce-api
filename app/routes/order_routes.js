@@ -31,9 +31,18 @@ const showOrder = (req, res, next) => {
   res.json({ order: req.order })
 }
 
+// Creates an order, or locates the current order and returns that
 const createOrder = (req, res, next) => {
+  Order.findOne({ completed: false, owner: req.user.id })
+    .then(currOrder => {
+      if (currOrder) {
+        return currOrder
+      }
+      else {
   req.body.order.owner = req.user.id
-  Order.create(req.body.order)
+        return Order.create(req.body.order)
+      }
+    })
     .then(order => res.status(201).json({ order }))
     .catch(next)
 }
@@ -93,6 +102,6 @@ router.route('/:id')
   .delete(findOrderMiddleware, deleteOrder)
 
 // Custom Routes
-router.patch('/orders/:id/checkout', requireToken, findOrderMiddleware, checkoutOrder)
+router.patch('/:id/checkout', findOrderMiddleware, checkoutOrder)
 
 module.exports = router
