@@ -1,7 +1,8 @@
 const express = require('express')
 const router = express.Router()
 
-const Order = require('../models/Order')
+const Order = require('../models/order')
+const Product = require('../models/product')
 
 const {
   handle404,
@@ -38,11 +39,33 @@ const createOrder = (req, res, next) => {
 }
 
 const updateOrder = (req, res, next) => {
-  if (!req.body.productId) {
-    next(new BadParamsError('Missing Product ID for order update'))
-  }
 
-  req.order.products.push(req.body.productId)
+  Promise.resolve()
+    .then(() => {
+      if (!req.body.productId) {
+        throw new BadParamsError('Missing Product ID for order update')
+      }
+      else if (req.order.completed) {
+        throw new BadParamsError('Cannot update closed order')
+      }
+
+      return Product.findById(req.body.productId)
+    })
+    .then(product => {
+      if (!product) {
+        throw new BadParamsError('Product ID Invalid')
+      }
+
+      req.order.products.push(req.body.productId)
+
+      return req.order.save()
+    })
+    .then(order => res.json({ order }))
+    .catch(next)
+}
+
+const checkoutOrder = (req, res, next) => {
+  req.order.completed = true
 
   req.order.save()
     .then(order => res.json({ order }))
@@ -69,8 +92,7 @@ router.route('/orders/:id')
   .get(findOrderMiddleware, showOrder)
   .delete(findOrderMiddleware, deleteOrder)
 
-  .patch(requireToken, updateOrder)
-  .get(requireToken, showOrder)
-  .delete(requireToken, deleteOrder)
+// Custom Routes
+router.patch('/orders/:id/checkout', requireToken, findOrderMiddleware, checkoutOrder)
 
 module.exports = router
