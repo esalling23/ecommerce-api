@@ -82,12 +82,12 @@ const deleteOrder = (req, res, next) => {
 router.use(requireToken)
 
 // Create & Index routes
-router.route('/orders')
+router.route('/')
   .post(createOrder)
   .get(indexOrders)
 
 // Update, Delete, & Show routes
-router.route('/orders/:id')
+router.route('/:id')
   .patch(findOrderMiddleware, updateOrder)
   .get(findOrderMiddleware, showOrder)
   .delete(findOrderMiddleware, deleteOrder)

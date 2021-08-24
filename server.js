@@ -57,9 +57,9 @@ app.use(express.urlencoded({ extended: true }))
 app.use(requestLogger)
 
 // register route files
-app.use(productRoutes)
-app.use(orderRoutes)
-app.use(userRoutes)
+app.use('/products', productRoutes)
+app.use('/orders', orderRoutes)
+app.use('/auth', userRoutes)
 
 // register error handling middleware
 // note that this comes after the route middlewares, because it needs to be
