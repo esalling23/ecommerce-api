@@ -18,7 +18,23 @@ const createOrder = (req, res, next) => {
     .catch(next)
 }
 
+const updateOrder = (req, res, next) => {
+  if (!req.body.productId) {
+    next(new BadParamsError('Missing Product ID for order update'))
+  }
+  Order.findById(req.params.id)
+    .then(handle404)
+    .then(order => requireOwnership(req, order))
+    .then(order => {
+      order.products.push(req.body.productId)
+      return order.save()
+    })
+    .then(order => res.json({ order }))
+    .catch(next)
+}
 router.route('/orders')
   .post(requireToken, createOrder)
+router.route('/orders/:id')
+  .patch(requireToken, updateOrder)
 
 module.exports = router
