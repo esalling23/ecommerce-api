@@ -6,6 +6,7 @@ const cors = require('cors')
 // require route files
 const productRoutes = require('./app/routes/product_routes')
 const orderRoutes = require('./app/routes/order_routes')
+const stripeRoutes = require('./app/routes/stripe_routes')
 const userRoutes = require('./app/routes/user_routes')
 
 // require middleware
@@ -59,6 +60,7 @@ app.use(requestLogger)
 // register route files
 app.use('/products', productRoutes)
 app.use('/orders', orderRoutes)
+app.use('/stripe', stripeRoutes)
 app.use('/auth', userRoutes)
 
 // register error handling middleware
