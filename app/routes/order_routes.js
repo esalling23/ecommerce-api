@@ -16,7 +16,7 @@ const findOrderMiddleware = (req, res, next) => {
   Order.findById(req.params.id)
     .then(handle404)
     .then(order => requireOwnership(req, order))
-    .then(order => req.order = order)
+    .then(order => { req.order = order })
     .then(() => next())
     .catch(next)
 }
@@ -37,9 +37,8 @@ const createOrder = (req, res, next) => {
     .then(currOrder => {
       if (currOrder) {
         return currOrder
-      }
-      else {
-  req.body.order.owner = req.user.id
+      } else {
+        req.body.order.owner = req.user.id
         return Order.create(req.body.order)
       }
     })
@@ -48,7 +47,6 @@ const createOrder = (req, res, next) => {
 }
 
 const updateOrder = (req, res, next) => {
-
   Promise.resolve()
     .then(() => {
       if (!req.body.productId) {
