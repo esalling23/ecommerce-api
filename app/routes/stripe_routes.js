@@ -10,20 +10,25 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 const calculateTotalPrice = products => {
   return products.reduce((a, c) => {
-    return a + (parseFloat(c.price).toFixed(2) * 100)
-  }, 0)
+    a.displayTotal += parseFloat(parseFloat(c.price).toFixed(2))
+    a.centsTotal += a.displayTotal * 100
+    return a
+  }, { centsTotal: 0, displayTotal: 0 })
 }
 
 router.post('/payment-intent/:orderId', requireToken, async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.orderId)
-    const totalPrice = calculateTotalPrice(order.products)
+    const { centsTotal, displayTotal } = calculateTotalPrice(order.products)
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: totalPrice,
+      amount: centsTotal,
       currency: 'usd'
     })
-    res.send(paymentIntent.client_secret)
-  } catch(err) {
+    res.send({
+      clientSecret: paymentIntent.client_secret,
+      totalPrice: displayTotal
+    })
+  } catch (err) {
     next(err)
   }
 })
