@@ -72,10 +72,16 @@ const updateOrder = (req, res, next) => {
 }
 
 const checkoutOrder = (req, res, next) => {
-  req.order.completed = true
-
-  req.order.save()
-    .then(order => res.json({ order }))
+  Promise.resolve()
+    .then(() => handleOrderCompleted(req.order))
+    .then(() => {
+      req.order.completed = true
+      req.order.totalPrice = calculateTotalPrice(req.order.products).centsTotal
+      return req.order.save()
+    })
+    .then(order => {
+      res.json({ order })
+    })
     .catch(next)
 }
 
