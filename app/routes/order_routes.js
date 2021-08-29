@@ -21,8 +21,14 @@ const findOrderMiddleware = (req, res, next) => {
     .catch(next)
 }
 
+// Query param `completed` allowed for filtering
+// ?completed=true to get only completed orders
 const indexOrders = (req, res, next) => {
-  Order.find({ owner: req.user.id })
+  const query = { owner: req.user.id }
+  if (req.query.completed) {
+    query.completed = true
+  }
+  Order.find(query)
     .then(orders => res.json({ orders }))
     .catch(next)
 }
