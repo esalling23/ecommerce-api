@@ -6,10 +6,11 @@ const Product = require('../models/product')
 
 const {
   handle404,
+  handleOrderCompleted,
   requireOwnership,
   BadParamsError
 } = require('../../lib/custom_errors')
-
+const { calculateTotalPrice } = require('../../lib/price_helpers')
 const requireToken = require('../../lib/require_token')
 
 const findOrderMiddleware = (req, res, next) => {
@@ -58,19 +59,12 @@ const updateOrder = (req, res, next) => {
       if (!req.body.productId) {
         throw new BadParamsError('Missing Product ID for order update')
       }
-      else if (req.order.completed) {
-        throw new BadParamsError('Cannot update closed order')
-      }
-
-      return Product.findById(req.body.productId)
     })
+    .then(() => handleOrderCompleted(req.order))
+    .then(() => Product.findById(req.body.productId))
+    .then(product => handle404(product, 'Product ID Invalid'))
     .then(product => {
-      if (!product) {
-        throw new BadParamsError('Product ID Invalid')
-      }
-
-      req.order.products.push(req.body.productId)
-
+      req.order.products.push(product._id)
       return req.order.save()
     })
     .then(order => res.json({ order }))
