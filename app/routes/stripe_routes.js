@@ -5,16 +5,9 @@ const router = express.Router()
 const Order = require('../models/order')
 
 const requireToken = require('../../lib/require_token')
+const { calculateTotalPrice } = require('../../lib/price_helpers')
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
-
-const calculateTotalPrice = products => {
-  return products.reduce((a, c) => {
-    a.displayTotal += parseFloat(parseFloat(c.price).toFixed(2))
-    a.centsTotal += a.displayTotal * 100
-    return a
-  }, { centsTotal: 0, displayTotal: 0 })
-}
 
 router.post('/payment-intent/:orderId', requireToken, async (req, res, next) => {
   try {

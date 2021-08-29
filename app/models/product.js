@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { toDisplayPrice, toCentsPrice } = require('../../lib/price_helpers')
 
 const productSchema = new mongoose.Schema({
   title: {
@@ -15,12 +16,8 @@ const productSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: true,
-    set: n => {
-      return n * 100
-    },
-    get: n => {
-      return (n / 100).toFixed(2)
-    }
+    set: toCentsPrice,
+    get: toDisplayPrice
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
