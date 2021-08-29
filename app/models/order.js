@@ -1,10 +1,15 @@
 const { model, Schema, Types } = require('mongoose')
+const { toDisplayPrice } = require('../../lib/price_helpers')
 
 const orderSchema = new Schema({
   products: [{
     type: Types.ObjectId,
     ref: 'Product'
   }],
+  totalPrice: {
+    type: Number,
+    get: toDisplayPrice
+  },
   completed: {
     type: Boolean,
     default: false
@@ -15,7 +20,10 @@ const orderSchema = new Schema({
     required: true
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  toJSON: {
+    getters: true
+  }
 })
 
 const populateProductsQuery = function () {
