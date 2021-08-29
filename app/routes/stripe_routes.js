@@ -4,6 +4,7 @@ const router = express.Router()
 
 const Order = require('../models/order')
 
+const { handleOrderCompleted } = require('../../lib/custom_errors')
 const requireToken = require('../../lib/require_token')
 const { calculateTotalPrice } = require('../../lib/price_helpers')
 
@@ -12,6 +13,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 router.post('/payment-intent/:orderId', requireToken, async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.orderId)
+    handleOrderCompleted(order)
     const { centsTotal, displayTotal } = calculateTotalPrice(order.products)
     const paymentIntent = await stripe.paymentIntents.create({
       amount: centsTotal,
