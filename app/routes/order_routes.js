@@ -31,12 +31,13 @@ const indexOrders = (req, res, next) => {
     query.completed = true
   }
   Order.find(query)
+    .then(orders => orders.map(o => o.toObject()))
     .then(orders => res.json({ orders }))
     .catch(next)
 }
 
 const showOrder = (req, res, next) => {
-  res.json({ order: req.order })
+  res.json({ order: req.order.toObject() })
 }
 
 // Creates an order, or locates the current order and returns that
@@ -51,6 +52,7 @@ const createOrder = (req, res, next) => {
         return Order.create(req.body.order)
       }
     })
+    .then(order => order.toObject())
     .then(order => res.status(201).json({ order }))
     .catch(next)
 }
@@ -91,6 +93,7 @@ const updateOrder = (req, res, next) => {
       order.totalPrice = calculateTotalPrice(order.products).centsTotal
       return order.save()
     })
+    .then(order => order.toObject())
     .then(order => res.json({ order }))
     .catch(next)
 }
@@ -103,9 +106,7 @@ const checkoutOrder = (req, res, next) => {
       req.order.totalPrice = calculateTotalPrice(req.order.products).centsTotal
       return req.order.save()
     })
-    .then(order => {
-      res.json({ order })
-    })
+    .then(order => res.json({ order: order.toObject() }))
     .catch(next)
 }
 
