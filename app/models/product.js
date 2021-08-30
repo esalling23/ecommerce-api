@@ -17,17 +17,12 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true,
     set: toCentsPrice,
-    get: toDisplayPrice
-  },
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    get: toDisplayPrice,
+    default: 0
   }
 }, {
   timestamps: true,
-  toJSON: {
-    // Docs say this is defaulted to true but getter will not run without set
+  toObject: {
     getters: true
   }
 })
