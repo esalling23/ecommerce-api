@@ -57,13 +57,22 @@ const createOrder = (req, res, next) => {
     .catch(next)
 }
 
+// PATCH /orders/:id/add
+// Accepts { productId: 'id', count: 3 } as body data
+// Will add product data to the order - if product exists, increases count by provided data
+// if passed the query param `updateProduct` (set to `true`), will replace product count with provided data
+// if passed the query param `deleteProduct` (set to `true`), will delete the product from the cart
 const updateOrder = (req, res, next) => {
+  const { updateProduct, deleteProduct } = req.query
+
   Promise.resolve()
     .then(() => {
       if (!req.body.productId) {
         throw new BadParamsError('Missing Product ID for order update')
       }
-      if (!req.body.count) {
+      if (!req.body.count && updateProduct) {
+        throw new BadParamsError('Provide a count value greater than 1')
+      } else if (!req.body.count) {
         req.body.count = 1
       }
     })
@@ -75,8 +84,19 @@ const updateOrder = (req, res, next) => {
       const currProd = req.order.products.find(el => el.productRef.equals(product.id))
       if (currProd) {
         const prodIndex = req.order.products.indexOf(currProd)
-        currProd.count += req.body.count
-        req.order.products.splice(prodIndex, 1, currProd)
+        if (deleteProduct) {
+          req.order.products.splice(prodIndex, 1)
+        } else {
+          if (updateProduct) {
+            currProd.count = req.body.count
+          } else {
+            currProd.count += req.body.count
+          }
+          req.order.products.splice(prodIndex, 1, currProd)
+        }
+      } else if (updateProduct || deleteProduct) {
+        // If updating & no currProd, throw error
+        throw new BadParamsError(`Cannot ${updateProduct ? 'update' : 'remove'} product not in cart`)
       } else {
         req.order.products.push({
           productRef: product.id,
