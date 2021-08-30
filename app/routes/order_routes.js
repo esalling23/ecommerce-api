@@ -15,6 +15,7 @@ const requireToken = require('../../lib/require_token')
 
 const findOrderMiddleware = (req, res, next) => {
   Order.findById(req.params.id)
+    .populate('products.productRef')
     .then(handle404)
     .then(order => requireOwnership(req, order))
     .then(order => { req.order = order })
@@ -41,6 +42,7 @@ const showOrder = (req, res, next) => {
 // Creates an order, or locates the current order and returns that
 const createOrder = (req, res, next) => {
   Order.findOne({ completed: false, owner: req.user.id })
+    .populate('products.productRef')
     .then(currOrder => {
       if (currOrder) {
         return currOrder
@@ -59,13 +61,35 @@ const updateOrder = (req, res, next) => {
       if (!req.body.productId) {
         throw new BadParamsError('Missing Product ID for order update')
       }
+      if (!req.body.count) {
+        req.body.count = 1
+      }
     })
     .then(() => handleOrderCompleted(req.order))
     .then(() => Product.findById(req.body.productId))
     .then(product => handle404(product, 'Product ID Invalid'))
     .then(product => {
-      req.order.products.push(product._id)
+      // check if this product exists already, we can just add another one
+      const currProd = req.order.products.find(el => el.productRef.equals(product.id))
+      if (currProd) {
+        const prodIndex = req.order.products.indexOf(currProd)
+        currProd.count += req.body.count
+        req.order.products.splice(prodIndex, 1, currProd)
+      } else {
+        req.order.products.push({
+          productRef: product.id,
+          count: req.body.count
+        })
+      }
       return req.order.save()
+    })
+    .then(order => {
+      // populate the productRef on each cart-product object
+      return Order.findById(order.id).populate('products.productRef')
+    })
+    .then(order => {
+      order.totalPrice = calculateTotalPrice(order.products).centsTotal
+      return order.save()
     })
     .then(order => res.json({ order }))
     .catch(next)

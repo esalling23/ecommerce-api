@@ -12,7 +12,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 router.post('/payment-intent/:orderId', requireToken, async (req, res, next) => {
   try {
-    const order = await Order.findById(req.params.orderId)
+    const order = await Order.findById(req.params.orderId).populate('products.productRef')
     handleOrderCompleted(order)
     const { centsTotal, displayTotal } = calculateTotalPrice(order.products)
     const paymentIntent = await stripe.paymentIntents.create({
