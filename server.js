@@ -12,6 +12,7 @@ const userRoutes = require('./app/routes/user_routes')
 // require middleware
 const errorHandler = require('./lib/error_handler')
 const requestLogger = require('./lib/request_logger')
+const { findOrder } = require('./lib/find_documents')
 
 // require database configuration logic
 // `db` will be the actual Mongo URI as a string
@@ -56,6 +57,9 @@ app.use(express.urlencoded({ extended: true }))
 
 // log each request as it comes in for debugging
 app.use(requestLogger)
+
+// Every time a URL has `:orderId` it will be provided a `req.order`
+app.param('orderId', findOrder)
 
 // register route files
 app.use('/products', productRoutes)
