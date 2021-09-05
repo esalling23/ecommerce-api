@@ -36,11 +36,11 @@ const orderSchema = new Schema({
 })
 
 const populateProductsQuery = function () {
-  this.populate('products')
+  this.populate('products.productRef')
 }
 
 const populateProductsDoc = async function (doc) {
-  await doc.populate('products').execPopulate()
+  await doc.populate('products.productRef').execPopulate()
 }
 
 orderSchema
