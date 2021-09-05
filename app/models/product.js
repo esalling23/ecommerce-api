@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { toDisplayPrice, toCentsPrice } = require('../../lib/price_helpers')
 
 const productSchema = new mongoose.Schema({
   title: {
@@ -15,22 +16,13 @@ const productSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: true,
-    set: n => {
-      return n * 100
-    },
-    get: n => {
-      return (n / 100).toFixed(2)
-    }
-  },
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    set: toCentsPrice,
+    get: toDisplayPrice,
+    default: 0
   }
 }, {
   timestamps: true,
-  toJSON: {
-    // Docs say this is defaulted to true but getter will not run without set
+  toObject: {
     getters: true
   }
 })

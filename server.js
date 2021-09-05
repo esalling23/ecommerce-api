@@ -6,11 +6,13 @@ const cors = require('cors')
 // require route files
 const productRoutes = require('./app/routes/product_routes')
 const orderRoutes = require('./app/routes/order_routes')
+const stripeRoutes = require('./app/routes/stripe_routes')
 const userRoutes = require('./app/routes/user_routes')
 
 // require middleware
 const errorHandler = require('./lib/error_handler')
 const requestLogger = require('./lib/request_logger')
+const { findOrder } = require('./lib/find_documents')
 
 // require database configuration logic
 // `db` will be the actual Mongo URI as a string
@@ -59,6 +61,7 @@ app.use(requestLogger)
 // register route files
 app.use('/products', productRoutes)
 app.use('/orders', orderRoutes)
+app.use('/stripe', stripeRoutes)
 app.use('/auth', userRoutes)
 
 // register error handling middleware
