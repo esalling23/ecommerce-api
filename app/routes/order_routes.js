@@ -44,7 +44,6 @@ const createOrder = (req, res, next) => {
     .catch(next)
 }
 
-
 const checkoutOrder = (req, res, next) => {
   Promise.resolve()
     .then(() => {
