@@ -58,9 +58,6 @@ app.use(express.urlencoded({ extended: true }))
 // log each request as it comes in for debugging
 app.use(requestLogger)
 
-// Every time a URL has `:orderId` it will be provided a `req.order`
-app.param('orderId', findOrder)
-
 // register route files
 app.use('/products', productRoutes)
 app.use('/orders', orderRoutes)
