@@ -63,7 +63,7 @@ const updateOrder = (req, res, next) => {
     .then(order => {
       // // populate the productRef on each cart-product object
       //
-      res.json({ order })
+      res.json({ order: order.toObject() })
     })
     .catch(next)
 }
@@ -75,7 +75,7 @@ const removeFromOrder = (req, res, next) => {
 
   req.order.products.splice(prodIndex, 1)
   req.order.save()
-    .then(order => res.status(203).json({ order }))
+    .then(order => res.status(203).json({ order: order.toObject() }))
     .catch(next)
 }
 
