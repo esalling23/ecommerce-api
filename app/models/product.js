@@ -10,6 +10,9 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  image: {
+    type: String
+  },
   // Price will be stored as cents
   // Then converted to `00.00` format with getter
   // https://stackoverflow.com/questions/13304129/how-should-i-store-a-price-in-mongoose
