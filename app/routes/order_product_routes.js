@@ -79,7 +79,7 @@ const removeFromOrder = (req, res, next) => {
     .catch(next)
 }
 
-router.use(requireProductId, requireOpenOrder, findProduct, findProductInOrder)
+router.use('/products', requireProductId, requireOpenOrder, findProduct, findProductInOrder)
 
 router.route('/products')
   .patch(requireProductInOrder, updateOrder)
