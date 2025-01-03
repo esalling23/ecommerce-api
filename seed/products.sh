@@ -1,1 +1,1 @@
-mongoimport --uri "mongodb+srv://admin:${PASS}@buy-things-api.kzbsy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority" --drop --collection products --type csv --file seed/products.csv --headerline
+mongoimport --uri "mongodb+srv://eronsalling:${PASS}@ecommerce-db.qb1r8.mongodb.net/?retryWrites=true&w=majority&appName=ecommerce-db" --drop --collection products --type csv --file seed/products.csv --headerline

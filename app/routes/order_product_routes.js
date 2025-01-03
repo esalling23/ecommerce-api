@@ -61,8 +61,6 @@ const updateOrder = (req, res, next) => {
       return req.order.save()
     })
     .then(order => {
-      // // populate the productRef on each cart-product object
-      //
       res.json({ order: order.toObject() })
     })
     .catch(next)

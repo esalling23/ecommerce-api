@@ -74,7 +74,7 @@ router.route('/:orderId')
   .get(findOrder, showOrder)
   .delete(findOrder, deleteOrder)
 
-// Include orderProductsRouter at `/:id` endpoint
+// Include Order-Product routes
 router.use('/:orderId', findOrder, orderProductsRouter)
 
 // Custom Routes
