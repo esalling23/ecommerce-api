@@ -7,7 +7,7 @@ const Order = require('../models/order')
 const { requireOpenOrder } = require('../../lib/custom_errors')
 const requireToken = require('../../lib/require_token')
 const { findOrder } = require('../../lib/find_documents')
-const { calculateTotalPrice } = require('../../lib/price_helpers')
+const { toDisplayPrice, calculateTotalCents } = require('../../lib/price_helpers')
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
@@ -18,7 +18,8 @@ router.post('/payment-intent/:orderId',
   async (req, res, next) => {
     try {
       const order = await Order.findById(req.params.orderId).populate('products.productRef')
-      const { centsTotal, displayTotal } = calculateTotalPrice(order.products)
+      const centsTotal = calculateTotalCents(order.products)
+      const displayTotal = toDisplayPrice(centsTotal)
       const paymentIntent = await stripe.paymentIntents.create({
         amount: centsTotal,
         currency: 'usd'

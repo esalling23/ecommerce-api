@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 
-const { calculateTotalPrice } = require('../../lib/price_helpers')
+const { calculateTotalCents } = require('../../lib/price_helpers')
 const {
   requireProductId,
   requireProductInOrder,
@@ -37,7 +37,7 @@ const addToOrder = (req, res, next) => {
     })
     .then(order => Order.findById(order.id).populate('products.productRef'))
     .then(order => {
-      order.totalPrice = calculateTotalPrice(order.products).centsTotal
+      order.totalPrice = calculateTotalCents(order.products)
       return order.save()
     })
     .then(order => res.json({ order: order.toObject() }))

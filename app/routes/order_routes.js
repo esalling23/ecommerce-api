@@ -4,7 +4,7 @@ const router = express.Router()
 const Order = require('../models/order')
 
 const { requireOpenOrder } = require('../../lib/custom_errors')
-const { calculateTotalPrice } = require('../../lib/price_helpers')
+const { calculateTotalCents } = require('../../lib/price_helpers')
 const { findOrder } = require('../../lib/find_documents')
 const requireToken = require('../../lib/require_token')
 
@@ -48,7 +48,7 @@ const checkoutOrder = (req, res, next) => {
   Promise.resolve()
     .then(() => {
       req.order.completed = true
-      req.order.totalPrice = calculateTotalPrice(req.order.products).centsTotal
+      req.order.totalPrice = calculateTotalCents(req.order.products)
       return req.order.save()
     })
     .then(order => res.json({ order: order.toObject() }))
