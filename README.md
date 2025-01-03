@@ -1,6 +1,6 @@
 # E-commerce API
 
-Express & Mongoose API
+Sample API to illustrate a simple e-commerce store implementation of the Stripe API. 
 
 ## ERD
 
@@ -13,7 +13,7 @@ Express & Mongoose API
 
 ### Authentication
 
-| HTTP Verb | Endpoint | Headers |
+| Method    | Endpoint | Headers |
 |-----------|----------|---------|
 | `POST` | `/sign-up` | None |
 | `POST` | `/sign-in` | None |
@@ -22,17 +22,24 @@ Express & Mongoose API
 
 ### Products
 
-| HTTP Verb | Endpoint | Headers |
+| Method    | Endpoint | Headers |
 |-----------|----------|---------|
 | `GET` | `/products` | None |
 | `GET` | `/products/:id` | None |
 
+
 ### Orders
 
-| Action | HTTP Verb | Endpoint | Headers |
+| Action | Method    | Endpoint | Headers |
 |--------|-----------|----------|---------|
 | Index Orders | `GET` | `/orders` | Bearer Token |
 | Show Order | `GET` | `/orders/:id` | Bearer Token |
 | Create Order | `POST` | `/orders` | Bearer Token |
 | Update Order | `PATCH` | `/orders/:id` | Bearer Token |
 | Delete Order | `DELETE` | `/orders/:id` | Bearer Token |
+
+### Payment
+
+| Action | Method    | Endpoint | Headers |
+|--------|-----------|----------|---------|
+| Create payment intent| `POST` | `/payment-intent/:orderId` | Bearer Token |
