@@ -1,25 +1,43 @@
 const express = require('express')
-// jsonwebtoken docs: https://github.com/auth0/node-jsonwebtoken
-const crypto = require('crypto')
-// Passport docs: http://www.passportjs.org/docs/
 const passport = require('passport')
-// bcrypt docs: https://github.com/kelektiv/node.bcrypt.js
 const bcrypt = require('bcrypt')
 
-// see above for explanation of "salting", 10 rounds is recommended
 const bcryptSaltRounds = 10
 
-// pull in error types and the logic to handle them and set status codes
 const errors = require('../../lib/custom_errors')
 
 const BadParamsError = errors.BadParamsError
 const BadCredentialsError = errors.BadCredentialsError
 
 const User = require('../models/user')
+const refreshToken = require('../../lib/refresh_token')
 
 const requireToken = passport.authenticate('bearer', { session: false })
 
 const router = express.Router()
+
+// GET BY ID
+// GET /:id
+router.get('/users/:id', (req, res, next) => {
+  User.findById(req.params.id)
+    .then(user => res.status(200).send({ user: user.ToObject() }))
+    .catch(next)
+})
+
+// GET BY TOKEN
+// GET /session
+router.get('/session', requireToken, (req, res, next) => {
+  if (!req.user) {
+    next(new Error('No user found. Session Expired, login again.'))
+    return
+  }
+  console.log(req.user)
+  User.findById(req.user._id)
+    .then(errors.handle404)
+    .then(refreshToken)
+    .then(user => res.status(200).json({ user: user.toObject() }))
+    .catch(next)
+})
 
 // SIGN UP
 // POST /sign-up
@@ -64,9 +82,7 @@ router.post('/sign-in', (req, res, next) => {
     .then(correctPassword => {
       if (correctPassword) {
         // Token will be a 16 byte random hex string
-        const token = crypto.randomBytes(16).toString('hex')
-        user.token = token
-        return user.save()
+        return refreshToken(user)
       } else {
         // Incorrect password
         throw new BadCredentialsError()
